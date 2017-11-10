@@ -2,6 +2,11 @@
     "name": "sushaowei/see",
     "description": "a php framework",
     "require": {
-        "php": "^5.3.3 || ^7.0"
-    }
+        "php": "^5.3.3 || ^7.0",
+        "smarty/smarty": "~3.1"
+    },
+    "autoload": {
+    	"files":["See.php"],
+        "psr-4": {"see\\": ""}
+    },
 }

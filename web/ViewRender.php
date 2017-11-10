@@ -5,12 +5,11 @@
  * Date: 16/7/5
  * Time: 下午2:47
  */
-namespace see\smarty;
+namespace see\web;
 
 use see\base\Object;
 use see\base\ViewRenderInterface;
 
-require (__DIR__."/smarty-3.1.29/libs/Smarty.class.php");
 class ViewRender extends Object implements ViewRenderInterface{
     /**
      * @var \Smarty
