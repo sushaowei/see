@@ -8,5 +8,5 @@
     "autoload": {
     	"files":["See.php"],
         "psr-4": {"see\\": ""}
-    },
+    }
 }
