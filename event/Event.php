@@ -5,7 +5,7 @@ namespace see\event;
 class Event 
 {
     /**
-     * @var string the event name. This property is set by [[Component::trigger()]] and [[trigger()]].
+     * @var string the event name. T
      * Event handlers may use this property to check what event it is handling.
      */
     public $name;
@@ -23,8 +23,7 @@ class Event
      */
     public $handled = false;
     /**
-     * @var mixed the data that is passed to [[Component::on()]] when attaching an event handler.
-     * Note that this varies according to which event handler is currently executing.
+     * @var mixed 
      */
     public $data;
 
@@ -35,24 +34,6 @@ class Event
 
 
     /**
-     * Attaches an event handler to a class-level event.
-     *
-     * When a class-level event is triggered, event handlers attached
-     * to that class and all parent classes will be invoked.
-     *
-     * For example, the following code attaches an event handler to `ActiveRecord`'s
-     * `afterInsert` event:
-     *
-     * ```php
-     * Event::on(ActiveRecord::className(), ActiveRecord::EVENT_AFTER_INSERT, function ($event) {
-     *     Yii::trace(get_class($event->sender) . ' is inserted.');
-     * });
-     * ```
-     *
-     * The handler will be invoked for EVERY successful ActiveRecord insertion.
-     *
-     * For more details about how to declare an event handler, please refer to [[Component::on()]].
-     *
      * @param string $class the fully qualified class name to which the event handler needs to attach.
      * @param string $name the event name.
      * @param callable $handler the event handler.
@@ -74,11 +55,7 @@ class Event
     }
 
     /**
-     * Detaches an event handler from a class-level event.
-     *
-     * This method is the opposite of [[on()]].
-     *
-     * @param string $class the fully qualified class name from which the event handler needs to be detached.
+     * @param string 
      * @param string $name the event name.
      * @param callable $handler the event handler to be removed.
      * If it is null, all handlers attached to the named event will be removed.
