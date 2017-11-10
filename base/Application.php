@@ -148,7 +148,7 @@ abstract class Application extends Module
             'log' => ['class' => 'see\base\Logger'],
             'db' => ['class' => 'see\db\PdoMysql'],
             'cache' => ['class' => 'see\base\Memcached'],
-            
+            'fileCache' => ['class' => 'see\base\FileCache'],
         ];
     }
 
@@ -258,5 +258,13 @@ abstract class Application extends Module
      */
     public function getCache(){
         return $this->get('cache');
+    }
+
+    /**
+     * @return mixed|object|FileCache
+     * @throws \ErrorException
+     */
+    public function getFileCache(){
+        return $this->get('fileCache');
     }
 }
