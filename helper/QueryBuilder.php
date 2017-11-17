@@ -4,7 +4,7 @@
  */
 namespace see\helper;
 
-use see\base\Component;
+use see\base\Object;
 use see\db\query\Query;
 use see\db\query\Select;
 
@@ -12,7 +12,7 @@ use see\db\query\Select;
  * Class QueryBuilder
  * @package app\helper
  */
-class QueryBuilder extends Component
+class QueryBuilder extends Object
 {
     /**
      * @var Query | Select
