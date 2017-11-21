@@ -10,8 +10,8 @@ class Controller extends \see\base\Controller
 
     public function __construct($id, $module, array $config= [])
     {
-        parent::__construct($id, $module, $config);
         $this->request = \See::$app->getRequest();
+        parent::__construct($id, $module, $config);
     }
 
 }
