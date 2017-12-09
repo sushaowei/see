@@ -8,6 +8,8 @@
 
 namespace see\base;
 use see\event\Event;
+use see\exception\NotFoundException;
+
 /**
  * Controller 的 Action 对象
  * Class Action

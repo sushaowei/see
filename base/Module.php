@@ -9,7 +9,6 @@ namespace see\base;
 use see;
 use see\exception\NotFoundException;
 use see\exception\ErrorException;
-use see\interfaces\BootstrapInterface;
 class Module extends ServiceLocation
 {
     //module id
@@ -115,7 +114,7 @@ class Module extends ServiceLocation
             // sub-module
             $module = $this->getModule(substr($id, 0, $pos));
 
-            return $module === null ? null : $module->getModule(substr($id, $pos + 1), $load);
+            return $module === null ? null : $module->getModule(substr($id, $pos + 1));
         }
 
         if (isset($this->modules[$id])) {

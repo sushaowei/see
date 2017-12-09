@@ -1,5 +1,6 @@
 <?php
 namespace see\console;
+use see\exception\NotFoundException;
 
 
 /**
@@ -29,7 +30,8 @@ class Application extends \see\base\Application
     }
 
     /**
-     * @return int
+     * @param string $argv
+     * @throws NotFoundException
      */
     public function run($argv='')
     {
