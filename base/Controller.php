@@ -111,4 +111,27 @@ class Controller extends Object
     public function assign($key,$value){
         $this->getView()->assign($key,$value);
     }
+
+    //绑定参数
+    public function bindActionParams($action, $params)
+    {
+        $reflection = new \ReflectionMethod($action->controller, $action->actionMethod);
+        $arg = $reflection->getParameters();
+        $result = [];
+        foreach ($arg as $parameter){
+            $name = $parameter->getName();
+            if($parameter->isDefaultValueAvailable()){
+                $value = $parameter->getDefaultValue();
+            }
+            if(isset($params[$name])){
+                $value = $params[$name];
+            }
+            if(!isset($value)){
+                $className = (new \ReflectionClass($action->controller))->getName();
+                throw new NotFoundException("action argv error, controller: $className, action: $action->actionMethod, not set arv: $name", 1);
+            }
+            $result[] = $value;
+        }
+        return $result;
+    }
 }
