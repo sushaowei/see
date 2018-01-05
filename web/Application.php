@@ -90,7 +90,6 @@ class Application extends \see\base\Application
             'urlManager' => ['class' => '\see\web\UrlManager'],
             'request' => ['class' => '\see\web\Request'],
             'response' => ['class' => '\see\web\Response'],
-            'view' => ['class' => '\see\web\View'],
         ]);
     }
 
