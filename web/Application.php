@@ -93,21 +93,5 @@ class Application extends \see\base\Application
             'view' => ['class' => '\see\web\View'],
         ]);
     }
-    
-    //event eventHandler
-    public function eventHandlerInit(){
-        $moduleDefault = $this->namespace . '\\events\\DefaultHandler';
-        if(class_exists($moduleDefault)){
-            $events = array_merge(['ModuleDefault'=>$moduleDefault],$this->events);
-        }else{
-            $events = $this->events;
-        }
-        foreach($events as $k=>$v){
-            if(!$this->has($k,true)){
-                $eventHandler = $this->createObject($v);
-                $this->set("see_event_".$k,$eventHandler);
-            }
-        }
-    }
 
 }

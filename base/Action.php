@@ -7,6 +7,7 @@
  */
 
 namespace see\base;
+use see\event\Event;
 use see\exception\NotFoundException;
 
 /**
