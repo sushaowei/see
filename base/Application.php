@@ -75,6 +75,8 @@ abstract class Application extends Module
 
     public static $e = 'e';
 
+    public $routeAll=[];
+
     /**
      * Application constructor.
      * @param array $config
@@ -266,5 +268,121 @@ abstract class Application extends Module
      */
     public function getFileCache(){
         return $this->get('fileCache');
+    }
+
+    /**
+     * 获取所有route
+     * @return array|mixed
+     */
+    public function generateAllRoute(){
+        if(!empty(\See::$app->routeAll)){
+            return \See::$app->routeAll;
+        }
+        $cacheKey = \See::$app->id . "_route";
+        $fileCache = \See::$app->get("fileCache");
+
+        $basePath = \See::$app->getBasePath();//根路径
+        $lastEditTime = filectime($basePath."/config/main.php");
+        $namespace = $this->controllerNamespace;
+        $files = $this->getControllersFile($namespace);
+
+        $module = isset($this->_config['modules'])?$this->_config['modules']:[];
+        $mFiles = $this->getModuleFiles($module);
+        //获取所有控制器文件
+        $files = array_merge($files,$mFiles);
+        //获取最修改时间，用来控制缓存过期
+        foreach($files as $row) {
+            $ctime = filectime($row['file']);
+            if ($ctime > $lastEditTime) {
+                $lastEditTime = $ctime;
+            }
+        }
+
+        $result = $fileCache->get($cacheKey);
+        if($result !== false){
+            $result = json_decode($result,true);
+            if(isset($result['lastEditTime']) && $result['lastEditTime'] == $lastEditTime){
+                \See::$app->routeAll = $result;
+                return $result;
+            }
+        }
+        $route = [];
+        foreach($files as $row){
+            $reflection = new \ReflectionClass($row['class']);
+            $methods = $reflection->getMethods();
+            $controllerName = $reflection->getName();
+            $controllerId = substr($controllerName,strrpos($controllerName,"\\")+1,-strlen("Controller"));
+
+            $proper = $reflection->getDefaultProperties();
+            $defaultAction = isset($proper['defaultAction']) ? $proper['defaultAction'] : "";
+            foreach($methods as $method){
+                if($method->isPublic()){
+                    $methodName = $method->getName();
+                    if(strncmp($methodName,'action',6) === 0){
+                        $tmp = [];
+                        $tmp['doc'] =$method->getDocComment();
+                        $actionName = lcfirst(substr($methodName,6));
+                        if($actionName == $defaultAction){
+                            $route[] = [
+                                'route'=>$row['id'] . '/' .lcfirst($controllerId),
+                                'doc'=>$tmp['doc'],
+                            ];
+                        }
+                        $tmp['route'] = $row['id'] . '/' .lcfirst($controllerId) .'/'. $actionName;
+                        $route[] = $tmp;
+                    }
+                }
+            }
+        }
+        $result = ['route'=>$route,'lastEditTime'=>$lastEditTime];
+        $fileCache->set($cacheKey,json_encode($result));
+        \See::$app->routeAll = $result;
+        return $result;
+    }
+
+    /**
+     * 获取所有模块控制器文件
+     * @param $moduleArray
+     * @param string $prefixId
+     * @return array
+     */
+    public function getModuleFiles($moduleArray,$prefixId=""){
+        $result = [];
+        if(empty($moduleArray)){
+            return $result;
+        }
+        foreach ($moduleArray as $id=>$moduleChild) {
+            $class = $moduleChild['class'];
+            $namespace = substr($class,0,strrpos($class,"\\"))."\controllers";
+            $result = array_merge($result,$this->getControllersFile($namespace,$prefixId."/".$id));
+            if(!empty($moduleChild['modules'])){
+                $r = $this->getModuleFiles($moduleChild['modules'],$prefixId."/".$id);
+                $result = array_merge($result,$r);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * 获取所有控制器
+     * @param $namespace
+     * @param string $id
+     * @return array
+     */
+    public function getControllersFile($namespace,$id=""){
+        $result = [];
+        $path = \See::getAlias("@" . str_replace('\\','/',$namespace));
+        $fileArray = scandir($path);
+        foreach($fileArray as $k=>$v){
+            if(substr($v,-strlen("Controller.php")) == "Controller.php"){
+                $controller = [];
+                $controller['class'] = $namespace . "\\" . basename($v,".php");
+                $controller['file'] = $path."/".$v;
+                $controller['id'] = $id;
+                $result[] = $controller;
+            }
+
+        }
+        return $result;
     }
 }

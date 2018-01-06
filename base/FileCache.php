@@ -89,7 +89,9 @@ class FileCache extends Object
     {
         $key = $this->buildKey($key);
         $cacheFile = $this->getCacheFile($key);
-
+        if(!file_exists($cacheFile)){
+            return false;
+        }
         if (@filemtime($cacheFile) > time()) {
             $fp = @fopen($cacheFile, 'r');
             if ($fp !== false) {
