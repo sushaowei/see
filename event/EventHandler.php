@@ -7,8 +7,7 @@ abstract class EventHandler
 
 	//set route callable 
 	public static function on(){
-		$requestedRoute = \See::$app->requestedRoute;
-		
+		list($requestedRoute,$_) = \See::$app->getRequest()->resolve();
 		$parts = static::resolve(func_get_args());
 		if($parts !== false){
 			list($route,$handler,$append) = $parts;

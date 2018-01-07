@@ -18,25 +18,23 @@ class Request extends Object
 
     private $_baseUrl;
     private $_resolve ;
+    private $_route;
 
     public function resolve()
     {
         if($this->_resolve === null){
-            $result = \See::$app->getUrlManager()->parseRequest($this);
-            if($result){
-                list($route, $params) = $result;
-                $params += $this->getQueryParams();
-                
-                $_resolve = [$route, $params];
-                $this->_resolve = $_resolve;
-                return $_resolve;
-            }else{
-                return false;
-            }
+            $result = \See::$app->getUrlManager()->parseRequest();
+            $_resolve = $result;
+            $this->_resolve = $_resolve;
+            return $_resolve;
         }else{
             return $this->_resolve;
         }
         
+    }
+
+    public function setRoute($route,$params=[]){
+        $this->_resolve = [$route,isset($this->_resolve[1])?$this->_resolve[1]:$params];
     }
 
     public function getMethod()

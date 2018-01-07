@@ -25,26 +25,39 @@ class ErrorHandler extends Object
      */
     public function handleException($exception){
         $url = isset($_SERVER['REQUEST_URI'])? "url:".$_SERVER['REQUEST_URI']."\n":"";
-        if(\See::$log){
-            if(\See::$app->envDev){
-                echo "<pre>";
-                echo $exception->getMessage();
-                echo $exception->getTraceAsString();
-                echo "</pre>";
-            }
-            \See::$log->addBasic('httpStatus', 500);
-            \See::$log->fatal("%s",$url.$exception->getMessage() . "\n" . $exception->getTraceAsString());
-        }else{
-            trigger_error($exception->getMessage());
+        $code = $exception->getCode();
+        if(!\See::$log){
+            trigger_error($exception->getMessage(),"url:".$url);
+            exit;
         }
-        exit(0);
+        $response = \See::$app->getResponse();
+        switch ($code){
+            case 500:
+                \See::$log->fatal("%s",$url.$exception->getMessage() . "\n" . $exception->getTraceAsString());
+                if(\See::$app->envDev){
+                    echo "<pre>";
+                    echo $exception->getMessage();
+                    echo $exception->getTraceAsString();
+                    echo "</pre>";
+                }
+                $response->setStatusCode(500);
+                $response->send("");
+                exit;
+                break;
+            case 404:
+                $response->notFoundSend($exception);
+                break;
+            default:
+                \See::$log->warning("%s",$url.$exception->getMessage() . "\n" . $exception->getTraceAsString());
+                break;
+        }
     }
     
     public function handleError($code, $message, $file, $line){
         if($code<2){
             throw new ErrorException($message. ',file: '.$file. ':' . $line);
         }else{
-            \See::$log->warning("%s",$message. ',file: '.$file. ':' . $line);
+            \See::$log->warning($message. ',file: '.$file. ':' . $line);
             if(\See::$app->envDev){
                 echo "<pre>";
                 echo "[warning]".$message. ',file: '.$file. ':' . $line;

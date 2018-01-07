@@ -174,23 +174,15 @@ class Response extends Object
      * @param NotFoundException $e
      */
     public function notFoundSend($e=null){
-        \See::$log->trace('trace not found');
-        $code = $e->getCode();
-        $msg = $e->getMessage();
-        if($code == 0){
-            \See::$log->warning('%s',$e->getMessage());
+        if(\See::$app->has('notFound')){
+            $notFound = \See::$app->get('notFound');
+            $notFound($e);
+        }elseif($this->notFoundTpl === null){
+            $this->setStatusCode(404);
+            $this->data = "404 not found";
+        }else{
+            $this->data = \See::$app->getView()->render($this->notFoundTpl);
         }
-        try{
-            $result = \See::$app->runAction($this->defaultNotFoundRoute,['code'=>$code,'msg'=>$msg]);
-            $this->data = $result;
-            \See::$log->trace('trace not found action');
-        }catch (NotFoundException $e){
-            if($this->notFoundTpl === null){
-                $this->setStatusCode(404);
-                $this->data = "404 not found";
-            }else{
-                $this->data = \See::$app->getView()->render($this->notFoundTpl);
-            }
-        }
+        $this->send();
     }
 }

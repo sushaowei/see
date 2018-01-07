@@ -75,7 +75,9 @@ abstract class Application extends Module
 
     public static $e = 'e';
 
-    public $routeAll=[];
+    public $_config;
+
+    public $routeAll;
 
     /**
      * Application constructor.
@@ -83,6 +85,7 @@ abstract class Application extends Module
      */
     public function __construct(array $config=[])
     {
+        $this->_config = $config;
         \See::$app = $this;
         $this->preInit($config);
         Object::__construct($config);
@@ -270,6 +273,7 @@ abstract class Application extends Module
         return $this->get('fileCache');
     }
 
+
     /**
      * 获取所有route
      * @return array|mixed
@@ -285,7 +289,6 @@ abstract class Application extends Module
         $lastEditTime = filectime($basePath."/config/main.php");
         $namespace = $this->controllerNamespace;
         $files = $this->getControllersFile($namespace);
-
         $module = isset($this->_config['modules'])?$this->_config['modules']:[];
         $mFiles = $this->getModuleFiles($module);
         //获取所有控制器文件
@@ -321,9 +324,9 @@ abstract class Application extends Module
                 $defaultController = \See::$app->defaultRoute;
             }else{
                 $prefix = substr($row['module'],strpos($row['module'],"\\"));
-                $prefix = substr($prefix, 0,-strrpos($prefix,'\\'));
+                $prefix = substr($prefix, 0,strrpos($prefix,'\\'));
                 $prefix = trim($prefix,'\\');
-                $prefix = "/".str_replace("\\","/",$prefix);
+                $prefix = str_replace("\\","/",$prefix);
                 if(!isset($moduleReflection[$row['moduleId']])){
                     $moduleReflection[$row['moduleId']] = new \ReflectionClass($row['module']);
                 }
@@ -337,7 +340,7 @@ abstract class Application extends Module
                         $tmp = [];
                         $tmp['doc'] =$method->getDocComment();
                         $actionName = lcfirst(substr($methodName,6));
-                        $tmp['route'][] = $prefix . '/' .$controllerId .'/'. $actionName;
+                        $tmp['route'][] = trim($prefix . '/' .$controllerId .'/'. $actionName,'/');
                         $tmp['_source'] = $row;
                         //默认路由
                         if($actionName ==$defaultAction ){
@@ -372,11 +375,7 @@ abstract class Application extends Module
         foreach ($moduleArray as $id=>$moduleChild) {
             $class = $moduleChild['class'];
             $namespace = substr($class,0,strrpos($class,"\\"))."\controllers";
-            $result = array_merge($result,$this->getControllersFile($namespace));
-            foreach($result as $k=>$v){
-                $result[$k]['module'] = $class;
-                $result[$k]['moduleId'] = $id;
-            }
+            $result = array_merge($result,$this->getControllersFile($namespace,$class,$id));
 
             if(!empty($moduleChild['modules'])){
                 $r = $this->getModuleFiles($moduleChild['modules']);
@@ -389,9 +388,11 @@ abstract class Application extends Module
     /**
      * 获取所有控制器
      * @param $namespace
+     * @param string $class
+     * @param string $id
      * @return array
      */
-    public function getControllersFile($namespace){
+    public function getControllersFile($namespace,$class="",$id=""){
         $result = [];
         $path = \See::getAlias("@" . str_replace('\\','/',$namespace));
         $fileArray = scandir($path);
@@ -400,6 +401,8 @@ abstract class Application extends Module
                 $controller = [];
                 $controller['class'] = $namespace . "\\" . basename($v,".php");
                 $controller['file'] = $path."/".$v;
+                $controller['module'] = $class;
+                $controller['moduleId'] = $id;
                 $result[] = $controller;
             }
         }

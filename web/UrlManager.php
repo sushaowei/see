@@ -9,18 +9,16 @@ class UrlManager extends Object
     public $routeParam = 'r';
 
     public $pretty =false;
-
+    
     public $showScriptFile = true;
-
+    
     public $suffix = "";
 
     public $rule;
 
-    private $_route;
 
     /**
-     * @param $request Request
-     * @return array
+     * @return array|bool
      */
     public function parseRequest(){
         $request = \See::$app->getRequest();
@@ -30,17 +28,15 @@ class UrlManager extends Object
             return $result;
         }
         $param = [];
-        if($this->_route !== null){
-            $route = $this->_route;
-        }elseif($this->pretty == true){
+        if($this->pretty == true){
             $scriptFile = $request->getScriptUrl();
             \See::$log->debug("path:%s", $pathInfo['path']);
             $route = $pathInfo['path'];
             if(strpos( $route, $scriptFile) !== false){
                 $route = substr($route, strlen($scriptFile));
             };
-
-
+            
+            
             \See::$log->debug("parse route: %s ", $route );
             if($this->suffix){
                 \See::$log->debug("suffix:%s", $this->suffix);
@@ -56,9 +52,6 @@ class UrlManager extends Object
         return [$route, $param];
     }
 
-    public function setRoute($route){
-        $this->_route = $route;
-    }
 
     private function parseRequestByRule($uri){
         if(!empty($this->rule)){
@@ -72,7 +65,7 @@ class UrlManager extends Object
         }
         return false;
     }
-
+    
     public function createUrl(array $params){
         $request = \See::$app->getRequest();
         $scriptUrl = $request->getScriptUrl();

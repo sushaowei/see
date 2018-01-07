@@ -60,4 +60,14 @@ class Response extends Object
             throw new ErrorException("The Response data must be a string");
         }
     }
+
+    public function notFoundSend($e=null){
+        if(\See::$app->has('notFound')){
+            $notFound = \See::$app->get('notFound');
+            $notFound($e);
+        }elseif($this->notFoundTpl === null){
+            $this->data = "404 not found";
+        }
+        $this->send();
+    }
 }

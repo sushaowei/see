@@ -21,58 +21,29 @@ class Application extends \see\base\Application
     public $defaultRoute = 'site';
 
     /**
-     * @param \see\web\Request $request
-     * @return mixed|Response|\see\web\Response
      */
     public function handleRequest($request)
     {
         $response = $this->getResponse();
         $request = $this->getRequest();
-        try {
-            try {
-                \See::$log->addBasic('clientIp', $request->getRealUserIp());
 
-                $parts = $request->resolve();
-                if($parts === false){
-                    throw new NotFoundException("Page not found", 404);
-                }
-                list($route,$params) = $parts;
-                $this->requestedRoute = $route;
+        \See::$log->addBasic('clientIp', $request->getRealUserIp());
 
-                \See::$log->addBasic('route', $this->requestedRoute);
+        $parts = $request->resolve();
 
-                $result = $this->runAction($route, $params);
+        list($route,$params) = $parts;
+        $this->requestedRoute = $route;
 
-                if ($request instanceof Response) {
-                    $response = $result;
-                } else {
-                    $response->data = $result;
-                }
-                $response->setStatusCode(200);
-            }catch(EventException $e){
-                $event = new Event();
-                $event->sender = $this;
-                $event->e = $e;
-                Event::trigger($this,'EventException',$event);
-            }
-        } catch (NotFoundException $e) {
-            $code = $e->getCode();
-            $response = \See::$app->getResponse();
-            switch ($code) {
-                case '301'://重定向
-                    $response->setStatusCode(301);
-                    break;
-                default:
-                    $response->setStatusCode(404);
-                    if(\See::$app->has('notFound')){
-                        $notFound = \See::$app->get('notFound');
-                        $notFound($e);
-                    }else{
-                        $response->notFoundSend($e);
-                    }
-                    break;
-            }
+        \See::$log->addBasic('route', $this->requestedRoute);
+
+        $result = $this->runAction($route, $params);
+
+        if ($request instanceof Response) {
+            $response = $result;
+        } else {
+            $response->data = $result;
         }
+        $response->setStatusCode(200);
 
     }
 

@@ -157,7 +157,7 @@ class Module extends ServiceLocation
             return $result;
         } else {
             $id = $this->getUniqueId();
-            throw new NotFoundException('Controller error,Unable to resolve the request "' . ($id === '' ? $route : $id . '/' . $route) . '".');
+            throw new NotFoundException('module id: '.$this->id.', Controller error,Unable to resolve the request "' . ($id === '' ? $route : $id . '/' . $route) . '".');
         }
     }
     //创建控制器
