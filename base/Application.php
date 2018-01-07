@@ -344,10 +344,10 @@ abstract class Application extends Module
                         $tmp['_source'] = $row;
                         //默认路由
                         if($actionName ==$defaultAction ){
-                            $tmp['route'][] = $prefix . '/' .$controllerId;
+                            $tmp['route'][] =trim( $prefix . '/' .$controllerId,"/");
                         }
                         if($defaultController == $controllerId && $actionName ==$defaultAction ){
-                            $tmp['route'][] = $prefix===""?"/":$prefix;
+                            $tmp['route'][] = trim($prefix===""?"/":$prefix,'/');
                         }
                         $route[] = $tmp;
                     }
