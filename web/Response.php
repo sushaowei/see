@@ -170,6 +170,10 @@ class Response extends Object
         }
     }
 
+    public function setHeaderJson(){
+        header('Content-type: application/json');
+    }
+
     /**
      * @param NotFoundException $e
      */
