@@ -301,20 +301,35 @@ abstract class Application extends Module
         $result = $fileCache->get($cacheKey);
         if($result !== false){
             $result = json_decode($result,true);
-            if(isset($result['lastEditTime']) && $result['lastEditTime'] == $lastEditTime){
+            if(!empty(isset($result['route'])) && isset($result['lastEditTime']) && $result['lastEditTime'] == $lastEditTime){
                 \See::$app->routeAll = $result;
                 return $result;
             }
         }
         $route = [];
+        $moduleReflection = [];
         foreach($files as $row){
             $reflection = new \ReflectionClass($row['class']);
             $methods = $reflection->getMethods();
             $controllerName = $reflection->getName();
             $controllerId = substr($controllerName,strrpos($controllerName,"\\")+1,-strlen("Controller"));
-
-            $proper = $reflection->getDefaultProperties();
-            $defaultAction = isset($proper['defaultAction']) ? $proper['defaultAction'] : "";
+            $controllerId = lcfirst($controllerId);
+            $controllerPropers = $reflection->getDefaultProperties();
+            $defaultAction = $controllerPropers['defaultAction'];
+            if(empty($row['module'])){
+                $prefix = "";
+                $defaultController = \See::$app->defaultRoute;
+            }else{
+                $prefix = substr($row['module'],strpos($row['module'],"\\"));
+                $prefix = substr($prefix, 0,-strrpos($prefix,'\\'));
+                $prefix = trim($prefix,'\\');
+                $prefix = "/".str_replace("\\","/",$prefix);
+                if(!isset($moduleReflection[$row['moduleId']])){
+                    $moduleReflection[$row['moduleId']] = new \ReflectionClass($row['module']);
+                }
+                $modulePropers = $moduleReflection[$row['moduleId']]->getDefaultProperties();
+                $defaultController = $modulePropers['defaultRoute'];
+            }
             foreach($methods as $method){
                 if($method->isPublic()){
                     $methodName = $method->getName();
@@ -322,31 +337,34 @@ abstract class Application extends Module
                         $tmp = [];
                         $tmp['doc'] =$method->getDocComment();
                         $actionName = lcfirst(substr($methodName,6));
-                        if($actionName == $defaultAction){
-                            $route[] = [
-                                'route'=>$row['id'] . '/' .lcfirst($controllerId),
-                                'doc'=>$tmp['doc'],
-                            ];
+                        $tmp['route'][] = $prefix . '/' .$controllerId .'/'. $actionName;
+                        $tmp['_source'] = $row;
+                        //默认路由
+                        if($actionName ==$defaultAction ){
+                            $tmp['route'][] = $prefix . '/' .$controllerId;
                         }
-                        $tmp['route'] = $row['id'] . '/' .lcfirst($controllerId) .'/'. $actionName;
+                        if($defaultController == $controllerId && $actionName ==$defaultAction ){
+                            $tmp['route'][] = $prefix===""?"/":$prefix;
+                        }
                         $route[] = $tmp;
                     }
                 }
             }
         }
+
         $result = ['route'=>$route,'lastEditTime'=>$lastEditTime];
         $fileCache->set($cacheKey,json_encode($result));
         \See::$app->routeAll = $result;
         return $result;
     }
 
+
     /**
      * 获取所有模块控制器文件
      * @param $moduleArray
-     * @param string $prefixId
      * @return array
      */
-    public function getModuleFiles($moduleArray,$prefixId=""){
+    public function getModuleFiles($moduleArray){
         $result = [];
         if(empty($moduleArray)){
             return $result;
@@ -354,9 +372,14 @@ abstract class Application extends Module
         foreach ($moduleArray as $id=>$moduleChild) {
             $class = $moduleChild['class'];
             $namespace = substr($class,0,strrpos($class,"\\"))."\controllers";
-            $result = array_merge($result,$this->getControllersFile($namespace,$prefixId."/".$id));
+            $result = array_merge($result,$this->getControllersFile($namespace));
+            foreach($result as $k=>$v){
+                $result[$k]['module'] = $class;
+                $result[$k]['moduleId'] = $id;
+            }
+
             if(!empty($moduleChild['modules'])){
-                $r = $this->getModuleFiles($moduleChild['modules'],$prefixId."/".$id);
+                $r = $this->getModuleFiles($moduleChild['modules']);
                 $result = array_merge($result,$r);
             }
         }
@@ -366,10 +389,9 @@ abstract class Application extends Module
     /**
      * 获取所有控制器
      * @param $namespace
-     * @param string $id
      * @return array
      */
-    public function getControllersFile($namespace,$id=""){
+    public function getControllersFile($namespace){
         $result = [];
         $path = \See::getAlias("@" . str_replace('\\','/',$namespace));
         $fileArray = scandir($path);
@@ -378,11 +400,10 @@ abstract class Application extends Module
                 $controller = [];
                 $controller['class'] = $namespace . "\\" . basename($v,".php");
                 $controller['file'] = $path."/".$v;
-                $controller['id'] = $id;
                 $result[] = $controller;
             }
-
         }
         return $result;
     }
+
 }
