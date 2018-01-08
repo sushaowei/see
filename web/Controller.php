@@ -14,7 +14,7 @@ class Controller extends \see\base\Controller
         $this->request = \See::$app->getRequest();
     }
 
-    public function renderJson(array $result){
+    public function renderJson( $result ){
         \See::$app->getResponse()->setHeaderJson();
         if(\See::$app->envDev){
             return json_encode($result,JSON_PRETTY_PRINT);
