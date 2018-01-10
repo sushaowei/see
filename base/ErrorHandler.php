@@ -33,7 +33,6 @@ class ErrorHandler extends Object
         $response = \See::$app->getResponse();
         switch ($code){
             case 500:
-                \See::$log->fatal("%s",$url.$exception->getMessage() . "\n" . $exception->getTraceAsString());
                 if(\See::$app->envDev){
                     echo "<pre>";
                     echo $exception->getMessage();
@@ -42,6 +41,7 @@ class ErrorHandler extends Object
                 }
                 $response->setStatusCode(500);
                 $response->send("");
+                \See::$log->fatal("%s",$url.$exception->getMessage() . "\n" . $exception->getTraceAsString());
                 exit;
                 break;
             case 404:
