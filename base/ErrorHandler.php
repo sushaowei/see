@@ -8,6 +8,7 @@
 
 namespace see\base;
 use see\exception\ErrorException;
+use see\exception\NotFoundException;
 
 class ErrorHandler extends Object
 {
@@ -25,39 +26,24 @@ class ErrorHandler extends Object
      */
     public function handleException($exception){
         $url = isset($_SERVER['REQUEST_URI'])? "url:".$_SERVER['REQUEST_URI']."\n":"";
-        $code = $exception->getCode();
         if(!\See::$log){
             trigger_error($exception->getMessage(),"url:".$url);
             exit;
         }
         $response = \See::$app->getResponse();
-        switch ($code){
-//            case 500:
-//                if(\See::$app->envDev){
-//                    echo "<pre>";
-//                    echo $exception->getMessage();
-//                    echo $exception->getTraceAsString();
-//                    echo "</pre>";
-//                }
-//                $response->setStatusCode(500);
-//                $response->send("");
-//                \See::$log->fatal("%s",$url.$exception->getMessage() . "\n" . $exception->getTraceAsString());
-//                exit;
-//                break;
-            case 404:
-                $response->notFoundSend($exception);
-                break;
-            default:
-                if(\See::$app->envDev){
-                    echo "<pre>";
-                    echo $exception->getMessage();
-                    echo $exception->getTraceAsString();
-                    echo "</pre>";
-                }
-                $response->setStatusCode(500);
-                $response->send("");
-                \See::$log->fatal("%s",$url.$exception->getMessage() . "\n" . $exception->getTraceAsString());
-                break;
+        if($exception instanceof NotFoundException){
+            $response->notFoundSend($exception);
+        }else{
+            if(\See::$app->envDev){
+                echo "<pre>";
+                echo $exception->getMessage();
+                echo $exception->getTraceAsString();
+                echo "</pre>";
+            }
+            $response->setStatusCode(500);
+            $response->send("");
+            \See::$log->fatal("%s",$url.$exception->getMessage() . "\n" . $exception->getTraceAsString());
+            exit;
         }
     }
     
