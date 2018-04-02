@@ -13,7 +13,7 @@ use see\exception\NotFoundException;
 class ErrorHandler extends Object
 {
     public function register(){
-        if(\See::$app->envDev){
+        if(\See::$app->debug){
             ini_set('display_errors', true);
         }
         set_exception_handler([$this, 'handleException']);
@@ -34,7 +34,7 @@ class ErrorHandler extends Object
         if($exception instanceof NotFoundException){
             $response->notFoundSend($exception);
         }else{
-            if(\See::$app->envDev){
+            if(\See::$app->debug){
                 echo "<pre>";
                 echo $exception->getMessage();
                 echo $exception->getTraceAsString();
@@ -52,7 +52,7 @@ class ErrorHandler extends Object
             throw new ErrorException($message. ',file: '.$file. ':' . $line);
         }else{
             \See::$log->warning($message. ',file: '.$file. ':' . $line);
-            if(\See::$app->envDev){
+            if(\See::$app->debug){
                 echo "<pre>";
                 echo "[warning]".$message. ',file: '.$file. ':' . $line;
                 echo "</pre>";

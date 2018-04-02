@@ -28,6 +28,29 @@ abstract class EventHandler
 		}
 		
 	}
+    //set route callable
+    public static function on_(){
+        list($requestedRoute,$_) = \See::$app->getRequest()->resolve();
+        $parts = static::resolve(func_get_args());
+        if($parts !== false){
+            list($route,$handler,$append) = $parts;
+            $add = true;
+            if(is_string($route)){
+                $add = !self::match($route,$requestedRoute);
+            }elseif(is_array($route)){
+                foreach($route as $routePattern){
+                    $add = self::match($routePattern,$requestedRoute);
+                    if($add == true){
+                        $add = false;
+                    }
+                }
+            }
+            if($add){
+                Event::on(static::$eventClass, static::$eventName, $handler, null, $append);
+            }
+        }
+
+    }
 	// remove route event 
 	public static function off($handler=null){
 		Event::off(static::$eventClass, static::$eventName,$handler);

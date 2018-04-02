@@ -79,6 +79,8 @@ abstract class Application extends Module
 
     public $routeAll;
 
+    public $debug=false;
+
     /**
      * Application constructor.
      * @param array $config

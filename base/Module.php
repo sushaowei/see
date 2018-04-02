@@ -148,6 +148,10 @@ class Module extends ServiceLocation
     //run
     public function runAction($route, $params = [])
     {
+        $event = new see\event\Event();
+        $event->sender = $this;
+        see\event\Event::trigger($this,'RunAction',$event);
+
         $parts = $this->createController($route);
         if (is_array($parts)) {
             /* @var $controller Controller */
