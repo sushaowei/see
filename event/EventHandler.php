@@ -39,8 +39,8 @@ abstract class EventHandler
                 $add = !self::match($route,$requestedRoute);
             }elseif(is_array($route)){
                 foreach($route as $routePattern){
-                    $add = self::match($routePattern,$requestedRoute);
-                    if($add == true){
+                    $tmp = self::match($routePattern,$requestedRoute);
+                    if($tmp == true){
                         $add = false;
                     }
                 }
