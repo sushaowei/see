@@ -27,7 +27,9 @@ class Response extends Object
     public $notFoundTpl;
 
     public $statusText;
-    
+
+    private $_statusCode = 200;
+
     public function init(){
         if( $this->charset === null){
             $this->charset = \See::$app->charset;
@@ -69,5 +71,12 @@ class Response extends Object
             $this->data = "404 not found";
         }
         $this->send();
+    }
+    public function setStatusCode($value, $text=null){
+        if($value === null){
+            $value =200;
+        }
+
+        $this->_statusCode = (int)$value;
     }
 }
