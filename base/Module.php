@@ -212,7 +212,7 @@ class Module extends ServiceLocation
             $className = substr($id, $pos + 1);
         }
 
-        if (!preg_match('%^[a-z][a-z0-9\\-_]*$%', $className)) {
+        if (!preg_match('%^[a-z][a-z0-9A-Z\\-_]*$%', $className)) {
             return null;
         }
         if ($prefix !== '' && !preg_match('%^[a-z0-9_/]+$%i', $prefix)) {
