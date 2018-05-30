@@ -13,6 +13,7 @@ use see\db\query\Insert;
 use see\db\query\Query;
 use see\db\query\Select;
 use see\db\query\Update;
+use see\event\Event;
 use see\exception\ErrorException;
 
 /**
@@ -88,6 +89,12 @@ class PdoMysql extends Object{
         $sqlStart = microtime(true);
         $logSql = is_string($sql) ? $sql :$sql->buildSql();
         \See::$log->trace("sql:%s", $logSql);
+        //触发beforeAction 事件
+        $event = new Event();
+        $event->sender = $this;
+        $event->data = $logSql;
+        Event::trigger($this,'BeforeQuery',$event);
+
         $this->stat = $this->db->prepare($sql);
         if($this->stat->execute($values)){
             $sqlEnd = microtime(true);

@@ -6,7 +6,7 @@
         "smarty/smarty": "~3.1"
     },
     "autoload": {
-    	"files":["See.php"],
+    	"files":["See.php","helper/Conf.php"],
         "psr-4": {"see\\": ""}
     }
 }
