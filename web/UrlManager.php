@@ -30,16 +30,13 @@ class UrlManager extends Object
         $param = [];
         if($this->pretty == true){
             $scriptFile = $request->getScriptUrl();
-            \See::$log->debug("path:%s", $pathInfo['path']);
             $route = $pathInfo['path'];
             if(strpos( $route, $scriptFile) !== false){
                 $route = substr($route, strlen($scriptFile));
             };
             
             
-            \See::$log->debug("parse route: %s ", $route );
             if($this->suffix){
-                \See::$log->debug("suffix:%s", $this->suffix);
                 if(strrpos($route, $this->suffix) !== false){
                     $route = substr($route, 0, -1*strlen($this->suffix));
                 }

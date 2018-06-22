@@ -88,7 +88,7 @@ class PdoMysql extends Object{
     public function query($sql, array $values=[]){
         $sqlStart = microtime(true);
         $logSql = is_string($sql) ? $sql :$sql->buildSql();
-        \See::$log->trace("sql:%s", $logSql);
+        \See::$log->trace("trace sql:%s", $logSql);
         //触发beforeAction 事件
         $event = new Event();
         $event->sender = $this;
