@@ -107,6 +107,9 @@ class Controller extends Object
     {
         return $this->getView()->render($view, $params,$this);
     }
+    public function renderJson( $params){
+        return $this->getView()->renderJson($params);
+    }
     // assign
     public function assign($key,$value){
         $this->getView()->assign($key,$value);

@@ -87,6 +87,23 @@ class View extends Object
         }
         return $output;
     }
+    /**
+     * 渲染json格式 
+     * @return string
+     */
+    public function renderJson($params ){
+        $this->params = array_merge($this->params,$params);
+        \See::$app->getResponse()->setHeaderJson();
+        //触发beforeAction 事件
+        $event = new Event();
+        $event->sender = $this;
+        Event::trigger($this,'BeforeRender',$event);
+
+        if(\See::$app->envDev){
+            return json_encode($this->params,JSON_PRETTY_PRINT);
+        }
+        return json_encode($this->params);
+    }
 
     /**
      * get uniqueId controller/action

@@ -40,6 +40,9 @@ class LoggerTrace extends Object
 
     public $suffix;
 
+    public $stid;
+    public $seq = "";
+
     public function addBasic($key, $value)
     {
 
@@ -93,7 +96,7 @@ class LoggerTrace extends Object
         $pattern = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLOMNOPQRSTUVWXYZ';
         $key = "";
         for ($i = 0; $i < $length; $i++) {
-            
+
             $key .= $pattern {
                 mt_rand(0, 35)};    //生成php随机数   
         }
@@ -116,21 +119,23 @@ class LoggerTrace extends Object
             $_SERVER['_seq'] = "1.1";
         } else {
             $prefix = substr($_SERVER['_seq'], 0, strrpos($_SERVER['_seq'], "."));
-            $num = substr($_SERVER['_seq'], strrpos($_SERVER['_seq'], ".")+1);
-            $_SERVER['_seq'] = $prefix."." . ((int)$num + 1);
+            $num = substr($_SERVER['_seq'], strrpos($_SERVER['_seq'], ".") + 1);
+            $_SERVER['_seq'] = $prefix . "." . ((int)$num + 1);
         }
+        $this->seq = $_SERVER['_seq'];
         return $_SERVER['_seq'];
     }
 
     //json
-    public function formatArg($arrArg){
-        if(is_array($arrArg)){
-            foreach($arrArg as $k=>$v){
-                if($k==0){
+    public function formatArg($arrArg)
+    {
+        if (is_array($arrArg)) {
+            foreach ($arrArg as $k => $v) {
+                if ($k == 0) {
                     continue;
                 }
-                if(is_array($v)){
-                    $arrArg[$k] = json_encode($v,JSON_UNESCAPED_UNICODE);
+                if (is_array($v)) {
+                    $arrArg[$k] = json_encode($v, JSON_UNESCAPED_UNICODE);
                 }
             }
         }
@@ -161,6 +166,7 @@ class LoggerTrace extends Object
         $seq = $this->getSeq();
         $content .= "\t_rid:" . ($tid) . "-" . $seq;
         $content .= "\t_tid:" . $tid;
+        $content .= "\t_stid:" . $this->stid();
         $content .= "\t_seq:" . $seq;
         $content .= "\t_app:" . \See::$app->id;
         $content .= "\t_time:" . time();
@@ -174,13 +180,13 @@ class LoggerTrace extends Object
 
         $arrArg = $this->formatArg($arrArg);
         $msg = "";
-        $msg .= "level:". self::$ARR_DESC[$level];
+        $msg .= "level:" . self::$ARR_DESC[$level];
         $arrTrace = debug_backtrace();
         if (isset($arrTrace[1])) {
             $line = $arrTrace[1]['line'];
             $file = $arrTrace[1]['file'];
             $file = substr($file, strlen(\See::$app->getBasePath()) + 1);
-            $msg .= (" ". $file .":".$line);
+            $msg .= (" " . $file . ":" . $line);
         }
         $msg .= call_user_func_array('sprintf', $arrArg);
 
@@ -190,8 +196,8 @@ class LoggerTrace extends Object
         $content .= "\t_ext:false";
         $content .= "\t_cost:" . $cost;
         $content .= "\t_version:1";
-        $content .= "\t_ua:" . isset($_SERVER['HTTP_USER_AGENT'])? $_SERVER['HTTP_USER_AGENT']:"";
-        
+        $content .= "\t_ua:" . isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "";
+
         $content .= "\n";
 
         $file = $this->fileArr[0];
@@ -205,6 +211,7 @@ class LoggerTrace extends Object
         }
         if ($level == self::L_WARNING) {
             $file = $this->fileArr[1];
+            $content .= "\t_err_tag:1";
             fputs($file, $content);
             if ($this->foreFlush) {
                 fflush($file);
@@ -221,6 +228,27 @@ class LoggerTrace extends Object
 
         }
 
+    }
+
+    public function stid()
+    {
+        if (!empty($this->stid)) {
+            return $this->stid;
+        }
+        $str = $this->getTraceId();
+        $arr = explode("_", $str);
+        $str = $arr[1];
+        $int = $arr[0];
+        for ($i = 0; $i < strlen($str); $i++) {
+            if (\is_numeric($str[$i])) {
+                $int += $str[$i];
+            } else {
+                $int += ord($str[$i]);
+            }
+        }
+        $int = (int)$int;
+        $this->stid = \base_convert($int, 10, 36);
+        return $this->stid;
     }
     public function getRealUserIp()
     {
