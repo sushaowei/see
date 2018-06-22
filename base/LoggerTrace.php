@@ -74,7 +74,7 @@ class LoggerTrace extends Object
         }
 
         $fileName1 = rtrim($this->path, '/') . DIRECTORY_SEPARATOR . trim($this->file, '/') . '-error.log';
-        $this->fileArr[1] = fopen($fileName1 . '.wf', 'a+');
+        $this->fileArr[1] = fopen($fileName1, 'a+');
         if (empty($this->fileArr[1])) {
             trigger_error("create log file $fileName1 failed, no disk space for permission");
             $this->fileArr = array();
@@ -82,7 +82,7 @@ class LoggerTrace extends Object
         }
 
         $fileName2 = rtrim($this->path, '/') . DIRECTORY_SEPARATOR . trim($this->file, '/') . '-fault.log';
-        $this->fileArr[2] = fopen($fileName2 . '.wf', 'a+');
+        $this->fileArr[2] = fopen($fileName2, 'a+');
         if (empty($this->fileArr[2])) {
             trigger_error("create log file $fileName2 failed, no disk space for permission");
             $this->fileArr = array();
