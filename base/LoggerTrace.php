@@ -196,7 +196,7 @@ class LoggerTrace extends Object
         $content .= "\t_ext:false";
         $content .= "\t_cost:" . $cost;
         $content .= "\t_version:1";
-        $content .= "\t_ua:" . isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "";
+        $content .= "\t_ua:" . (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "");
 
         $content .= "\n";
 
