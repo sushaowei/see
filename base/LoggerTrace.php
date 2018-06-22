@@ -122,6 +122,21 @@ class LoggerTrace extends Object
         return $_SERVER['_seq'];
     }
 
+    //json
+    public function formatArg($arrArg){
+        if(is_array($arrArg)){
+            foreach($arrArg as $k=>$v){
+                if($k==0){
+                    continue;
+                }
+                if(is_array($v)){
+                    $arrArg[$k] = json_encode($v,JSON_UNESCAPED_UNICODE);
+                }
+            }
+        }
+        return $arrArg;
+    }
+
     public function log($level, $arrArg)
     {
 
@@ -156,21 +171,27 @@ class LoggerTrace extends Object
         $content .= "\t_sip:" . $_SERVER['SERVER_ADDR'];
         $extParams = ["get" => $_GET, "post" => $_POST];
         $content .= "\t_ext_params:" . str_replace("\t", " ", json_encode($extParams));
-        $content .= "\t_params:" . str_replace("\t", " ", call_user_func_array('sprintf', $arrArg));
+
+        $arrArg = $this->formatArg($arrArg);
+        $msg = "";
+        $msg .= "level:". self::$ARR_DESC[$level];
+        $arrTrace = debug_backtrace();
+        if (isset($arrTrace[1])) {
+            $line = $arrTrace[1]['line'];
+            $file = $arrTrace[1]['file'];
+            $file = substr($file, strlen(\See::$app->getBasePath()) + 1);
+            $msg .= (" ". $file .":".$line);
+        }
+        $msg .= call_user_func_array('sprintf', $arrArg);
+
+        $content .= "\t_params:" . str_replace("\t", " ", $msg);
 
         $cost = round(microtime(true) - SEE_BEGIN_TIME, 2);
         $content .= "\t_ext:false";
         $content .= "\t_cost:" . $cost;
         $content .= "\t_version:1";
-        $content .= "\t_ua:" . $_SERVER['HTTP_USER_AGENT'];
+        $content .= "\t_ua:" . isset($_SERVER['HTTP_USER_AGENT'])? $_SERVER['HTTP_USER_AGENT']:"";
         
-        // $arrTrace = debug_backtrace();
-        // if (isset($arrTrace[1])) {
-        //     $line = $arrTrace[1]['line'];
-        //     $file = $arrTrace[1]['file'];
-        //     $file = substr($file, strlen(\See::$app->getBasePath()) + 1);
-        //     $content .= "[$file:$line]";
-        // }
         $content .= "\n";
 
         $file = $this->fileArr[0];
