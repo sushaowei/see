@@ -43,6 +43,7 @@ class LoggerTrace extends Object
     public $stid;
     public $seq = "";
     public $seqNext = true;
+    public $seqInit = false;
 
     public function addBasic($key, $value)
     {
@@ -122,17 +123,25 @@ class LoggerTrace extends Object
         if (isset($_SERVER['HTTP_PHP_SEQ'])) {
             $_SERVER['_seq'] = $_SERVER['HTTP_PHP_SEQ'];
         }
-        if (!isset($_SERVER['_seq'])) {
-            $_SERVER['_seq'] = "1.1";
-        } else {
-            if ($this->seqNext === true) {
-                $prefix = substr($_SERVER['_seq'], 0, strrpos($_SERVER['_seq'], "."));
-                $num = substr($_SERVER['_seq'], strrpos($_SERVER['_seq'], ".") + 1);
-                $_SERVER['_seq'] = $prefix . "." . ((int)$num + 1);
-            }
+        if(empty($_SERVER['_seq'])){
+            $this->seq = $_SERVER['_seq'] = "1.1";
+            return $this->seq;
+        }
+
+        //向下添加一层
+        if($this->seqInit === false){
+            $this->seqInit = true;
+            $_SERVER['_seq'] .= ".1";
+            $this->seq = $_SERVER['_seq'];
+            return $this->seq;
+        }
+        if ($this->seqNext === true) {
+            $prefix = substr($_SERVER['_seq'], 0, strrpos($_SERVER['_seq'], "."));
+            $num = substr($_SERVER['_seq'], strrpos($_SERVER['_seq'], ".") + 1);
+            $_SERVER['_seq'] = $prefix . "." . ((int)$num + 1);
         }
         $this->seq = $_SERVER['_seq'];
-        return $_SERVER['_seq'];
+        return $this->seq;
     }
      //set seq
     public function setSeqNext($next)
