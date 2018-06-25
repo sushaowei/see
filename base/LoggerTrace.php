@@ -120,7 +120,7 @@ class LoggerTrace extends Object
     //get seq
     public function getSeq()
     {
-        if (isset($_SERVER['HTTP_PHP_SEQ'])) {
+        if (!empty($_SERVER['HTTP_PHP_SEQ']) && empty($_SERVER['_seq'])) {
             $_SERVER['_seq'] = $_SERVER['HTTP_PHP_SEQ'];
         }
         if(empty($_SERVER['_seq'])){
