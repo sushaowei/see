@@ -88,7 +88,7 @@ class MyCurl
         //set header
         $traceId = \See::$log->getTraceId();
         $seq = \See::$log->getSeq();
-        \See::$log->setSeqNext(false);
+        \See::$log->setSeq($seq);
         $this->setHeader(['_tid:'.$traceId]);
         $this->setHeader(['_seq:'.$seq]);
         $this->setHeader(['PHP-TID:'.$traceId]);
@@ -112,7 +112,6 @@ class MyCurl
         }else{
             \See::$log->trace("curl, url:%s,type:%s,post:%s,return:%s",$this->url,$this->type,$this->postFields,$this->returnData);
         }
-        \See::$log->setSeqNext(true);
         curl_close($this->handler);
         return $this->returnData;
     }

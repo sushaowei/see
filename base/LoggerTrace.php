@@ -42,7 +42,7 @@ class LoggerTrace extends Object
 
     public $stid;
     public $seq = "";
-    public $seqNext = true;
+    public $seqSet = "";
     public $seqInit = false;
 
     public function addBasic($key, $value)
@@ -125,6 +125,7 @@ class LoggerTrace extends Object
         }
         if(empty($_SERVER['_seq'])){
             $this->seq = $_SERVER['_seq'] = "1.1";
+            $this->seqInit = true;
             return $this->seq;
         }
 
@@ -135,18 +136,17 @@ class LoggerTrace extends Object
             $this->seq = $_SERVER['_seq'];
             return $this->seq;
         }
-        if ($this->seqNext === true) {
-            $prefix = substr($_SERVER['_seq'], 0, strrpos($_SERVER['_seq'], "."));
-            $num = substr($_SERVER['_seq'], strrpos($_SERVER['_seq'], ".") + 1);
-            $_SERVER['_seq'] = $prefix . "." . ((int)$num + 1);
-        }
+        $prefix = substr($_SERVER['_seq'], 0, strrpos($_SERVER['_seq'], "."));
+        $num = substr($_SERVER['_seq'], strrpos($_SERVER['_seq'], ".") + 1);
+        $_SERVER['_seq'] = $prefix . "." . ((int)$num + 1);
         $this->seq = $_SERVER['_seq'];
         return $this->seq;
     }
+
      //set seq
-    public function setSeqNext($next)
+    public function setSeq($seq)
     {
-        $this->seqNext = $next;
+        $this->seqSet = $seq;
     }
 
     //json
@@ -186,7 +186,12 @@ class LoggerTrace extends Object
         // $content .= self::$ARR_DESC[$level];
 
         $tid = $this->getTraceId();
-        $seq = $this->getSeq();
+        if(!empty($this->seqSet)){
+            $seq = $this->seqSet;
+            $this->seqSet = "";
+        }else{
+            $seq = $this->getSeq();
+        }
         $content .= "\t_rid:" . ($tid) . "-" . $seq;
         $content .= "\t_tid:" . $tid;
         $content .= "\t_stid:" . $this->stid();
