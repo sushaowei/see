@@ -42,6 +42,7 @@ class LoggerTrace extends Object
 
     public $stid;
     public $seq = "";
+    public $seqNext = true;
 
     public function addBasic($key, $value)
     {
@@ -118,12 +119,19 @@ class LoggerTrace extends Object
         if (!isset($_SERVER['_seq'])) {
             $_SERVER['_seq'] = "1.1";
         } else {
-            $prefix = substr($_SERVER['_seq'], 0, strrpos($_SERVER['_seq'], "."));
-            $num = substr($_SERVER['_seq'], strrpos($_SERVER['_seq'], ".") + 1);
-            $_SERVER['_seq'] = $prefix . "." . ((int)$num + 1);
+            if ($this->seqNext === true) {
+                $prefix = substr($_SERVER['_seq'], 0, strrpos($_SERVER['_seq'], "."));
+                $num = substr($_SERVER['_seq'], strrpos($_SERVER['_seq'], ".") + 1);
+                $_SERVER['_seq'] = $prefix . "." . ((int)$num + 1);
+            }
         }
         $this->seq = $_SERVER['_seq'];
         return $_SERVER['_seq'];
+    }
+     //set seq
+    public function setSeqNext($next)
+    {
+        $this->seqNext = $next;
     }
 
     //json
@@ -172,9 +180,9 @@ class LoggerTrace extends Object
         $content .= "\t_time:" . time();
         $content .= "\t_type:http";
         $content .= "\t_capp:";
-        $content .= "\t_path:" . $_SERVER['REQUEST_URI'];
+        $content .= "\t_path:" .(isset( $_SERVER['REQUEST_URI'])? $_SERVER['REQUEST_URI']:"");
         $content .= "\t_cip:" . $this->getRealUserIp();
-        $content .= "\t_sip:" . $_SERVER['SERVER_ADDR'];
+        $content .= "\t_sip:" . (isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : "");
         $extParams = ["get" => $_GET, "post" => $_POST];
         $content .= "\t_ext_params:" . str_replace("\t", " ", json_encode($extParams));
 
