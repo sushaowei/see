@@ -112,7 +112,7 @@ class MyCurl
         }
         \See::$log->setSeqNext(true);
         curl_close($this->handler);
-        return $this->renderData;
+        return $this->returnData;
     }
 
     public function get(){
