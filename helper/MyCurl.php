@@ -85,7 +85,6 @@ class MyCurl
         }else{
             curl_setopt($this->handler, CURLOPT_AUTOREFERER, true);
         }
-
         //set header
         $traceId = \See::$log->getTraceId();
         $seq = \See::$log->getSeq();
