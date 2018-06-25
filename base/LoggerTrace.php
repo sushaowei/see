@@ -107,6 +107,9 @@ class LoggerTrace extends Object
     //get traceId
     public function getTraceId()
     {
+        if(isset($_SERVER['HTTP_PHP_TID'])){
+            $_SERVER['_tid'] = $_SERVER['HTTP_PHP_TID'];
+        }
         if (!isset($_SERVER['_tid'])) {
             $_SERVER['_tid'] = time() . "_" . $this->randomkeys(4);
         }
@@ -116,6 +119,9 @@ class LoggerTrace extends Object
     //get seq
     public function getSeq()
     {
+        if (isset($_SERVER['HTTP_PHP_SEQ'])) {
+            $_SERVER['_seq'] = $_SERVER['HTTP_PHP_SEQ'];
+        }
         if (!isset($_SERVER['_seq'])) {
             $_SERVER['_seq'] = "1.1";
         } else {
