@@ -180,7 +180,7 @@ class LoggerTrace extends Object
             }
         }
 
-        $content = date('Ymd H:i:s');
+        $content = date('Y-m-d H:i:s');
         $content .= "." . intval($arrMicro[0] * 1000);
         $content .= " [" . \See::$app->id . "]";
         // $content .= self::$ARR_DESC[$level];
@@ -207,20 +207,20 @@ class LoggerTrace extends Object
         $content .= "\t_ext_params:" . str_replace("\t", " ", json_encode($extParams));
 
         $arrArg = $this->formatArg($arrArg);
-        $msg = "";
-        $msg .= "level:" . self::$ARR_DESC[$level];
+        $msgArr = [];
+        $msgArr['level'] =  self::$ARR_DESC[$level];
         $arrTrace = debug_backtrace();
         if (isset($arrTrace[1])) {
             $line = $arrTrace[1]['line'];
             $file = $arrTrace[1]['file'];
             $file = substr($file, strlen(\See::$app->getBasePath()) + 1);
-            $msg .= (" " . $file . ":" . $line);
+            $msgArr["file"] = ($file . ":" . $line);
         }
-        $msg .= call_user_func_array('sprintf', $arrArg);
+        $msgArr['msg'] = str_replace ("\t"," ",call_user_func_array('sprintf', $arrArg));
 
-        $content .= "\t_params:" . str_replace("\t", " ", $msg);
+        $content .= "\t_params:" . json_encode($msgArr);
 
-        $cost = round(microtime(true) - SEE_BEGIN_TIME, 2);
+        $cost = round(microtime(true) - SEE_BEGIN_TIME, 3)*1000;
         $content .= "\t_ext:false";
         $content .= "\t_cost:" . $cost;
         $content .= "\t_version:1";
