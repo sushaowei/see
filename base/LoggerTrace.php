@@ -182,7 +182,7 @@ class LoggerTrace extends Object
 
         $content = date('Y-m-d H:i:s');
         $content .= "." . intval($arrMicro[0] * 1000);
-        $content .= " [" . \See::$app->id . "]";
+        $content .= " [" . getmypid() . "]";
         // $content .= self::$ARR_DESC[$level];
 
         $tid = $this->getTraceId();
