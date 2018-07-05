@@ -85,6 +85,9 @@ class Memcached extends Object
     }
     
     public function set($key, $value, $expiration=0){
+        if($this->on == false){
+            return false;
+        }
         $key = !empty($this->prefix) ? $this->prefix.$key : $key;
         return $this->memcached->set($key,$value, $expiration);
     }
@@ -102,6 +105,34 @@ class Memcached extends Object
     }
 
     public function delete($key){
+        if($this->on == false){
+            return false;
+        }
+        $key = !empty($this->prefix) ? $this->prefix.$key : $key;
+        return $this->memcached->delete($key);
+    }
+    public function setNoPrefix($key, $value, $expiration=0){
+        if($this->on == false){
+            return false;
+        }
+        return $this->memcached->set($key,$value, $expiration);
+    }
+    
+    public function getNoPrefix($key){
+        if($this->on == false){
+            return false;
+        }
+        $result = $this->memcached->get($key);
+        if($result === false || $result === \Memcached::RES_NOTFOUND){
+            return false;
+        }
+        return $result;
+    }
+
+    public function deleteNoPrefix($key){
+        if($this->on == false){
+            return false;
+        }
         return $this->memcached->delete($key);
     }
 }
