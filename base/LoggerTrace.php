@@ -112,7 +112,7 @@ class LoggerTrace extends Object
             $_SERVER['_tid'] = $_SERVER['HTTP_PHP_TID'];
         }
         if (!isset($_SERVER['_tid'])) {
-            $_SERVER['_tid'] = time() . "_" . $this->randomkeys(4);
+            $_SERVER['_tid'] = round(microtime(1) * 1000) . "_" . $this->randomkeys(4);
         }
         return $_SERVER['_tid'];
     }
@@ -197,7 +197,7 @@ class LoggerTrace extends Object
         $content .= "\t_stid:" . $this->stid();
         $content .= "\t_seq:" . $seq;
         $content .= "\t_app:" . \See::$app->id;
-        $content .= "\t_time:" . time();
+        $content .= "\t_time:" . round(microtime(1) * 1000);
         $content .= "\t_type:http";
         $content .= "\t_capp:";
         $content .= "\t_path:" .(isset( $_SERVER['REQUEST_URI'])? $_SERVER['REQUEST_URI']:"");
