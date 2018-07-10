@@ -104,8 +104,8 @@ class MyCurl
         curl_setopt($this->handler, CURLOPT_TIMEOUT, $this->timeOut);
 
         if($this->type=='post'){
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postFields);
+            curl_setopt($this->handler, CURLOPT_POST, true);
+            curl_setopt($this->handler, CURLOPT_POSTFIELDS, $this->postFields);
         }
 
         $this->returnData = curl_exec($this->handler);
