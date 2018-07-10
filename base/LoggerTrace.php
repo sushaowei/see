@@ -218,7 +218,7 @@ class LoggerTrace extends Object
         }
         $msgArr['msg'] = str_replace ("\t"," ",call_user_func_array('sprintf', $arrArg));
 
-        $content .= "\t_params:" . json_encode($msgArr);
+        $content .= "\t_params:" . json_encode($msgArr, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
 
         $cost = round(microtime(true) - SEE_BEGIN_TIME, 3)*1000;
         $content .= "\t_ext:false";
