@@ -34,7 +34,7 @@ class MyCurl
 
     public function __construct($url)
     {
-        $url = trim($url);
+        $this->url = $url = trim($url);
         $this->handler = curl_init();
         curl_setopt($this->handler, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
         curl_setopt($this->handler, CURLOPT_RETURNTRANSFER, true);
@@ -42,8 +42,8 @@ class MyCurl
         //支持https
         $this->ssl = stripos($url, 'https://') === 0 ? true : false;
         if ($this->ssl) {
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($this->handler, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($this->handler, CURLOPT_SSL_VERIFYHOST, false);
         }
     }
 
