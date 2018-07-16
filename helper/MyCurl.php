@@ -87,14 +87,17 @@ class MyCurl
         }else{
             curl_setopt($this->handler, CURLOPT_AUTOREFERER, true);
         }
-        //set header
-        $traceId = \See::$log->getTraceId();
-        $seq = \See::$log->getSeq();
-        \See::$log->setSeq($seq);
-        $this->setHeader(['_tid:'.$traceId]);
-        $this->setHeader(['_seq:'.$seq]);
-        $this->setHeader(['PHP-TID:'.$traceId]);
-        $this->setHeader(['PHP-SEQ:'.$seq]);
+
+        if(\See::$log->className() == 'see\\base\\LoggerTrace'){
+            //set header
+            $traceId = \See::$log->getTraceId();
+            $seq = \See::$log->getSeq();
+            \See::$log->setSeq($seq);
+            $this->setHeader(['_tid:' . $traceId]);
+            $this->setHeader(['_seq:' . $seq]);
+            $this->setHeader(['PHP-TID:' . $traceId]);
+            $this->setHeader(['PHP-SEQ:' . $seq]);
+        }
 
         curl_setopt($this->handler,CURLOPT_HTTPHEADER,$this->header);
         curl_setopt($this->handler, CURLOPT_USERAGENT,$this->agent);
